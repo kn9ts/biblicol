@@ -1,11 +1,6 @@
-Django==1.9.1
-flake8==2.5.1
-mccabe==0.3.1
-mod-wsgi==4.4.22
+Django==1.9
 pbr==1.8.1
-pep8==1.7.0
 psycopg2==2.6.1
-pyflakes==1.0.0
 six==1.10.0
 stevedore==1.10.0
 virtualenv==13.1.2
