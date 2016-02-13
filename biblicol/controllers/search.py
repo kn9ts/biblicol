@@ -1,19 +1,25 @@
 import re
 from django.shortcuts import render
 from django.http import HttpResponse
-from ..helpers import utility as Helper
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from ..helpers.utility import Helper
+from ..models.bible import Bible
 
 
 class Search(object):
 
     # By default we expect books that dont start with no.s
     book_starts_with_no = False
+    page = 1
 
     @staticmethod
     def index(request, param='', pageno=1):
         # if nothing has been passed to the search, back to home page
         if param == '':
             return render(request, 'index.html', {})
+
+        if request.GET.get('page') is not None:
+            Search.page = request.GET.get('page')
 
         # remove underscores from smart URL
         param = re.sub(r'_{1,}', ' ', param, flags=re.IGNORECASE)
@@ -61,7 +67,7 @@ class Search(object):
                 param = "abcdefghijklmnopqrstuvwxyz"
 
             if re.match(r'^([\w.\-\d]+){1}$', param) is True:
-                book = Search.get_the_book_request(param)
+                book = Helper.get_the_book_requested(param)
                 book_is_valid = Helper.is_book_in_bible(book)
 
                 if book_is_valid is object:
@@ -136,16 +142,51 @@ class Search(object):
         return search_info
 
     @staticmethod
-    def get_the_book_request():
-        pass
-
-    @staticmethod
     def get_single_verse(search_param):
-        pass
+        book_requested = Helper.get_the_book_requested(
+            search_param,
+            Search.book_starts_with_no
+        )
+        exists = Helper.is_book_in_Bible(book_requested['book'])
+
+        if exists is not False:
+            return Search.show(
+                book_requested['book'],
+                book_requested['chapter'],
+                book_requested['verses'],
+                False
+            )
+        else:
+            return None
 
     @staticmethod
-    def get_multiple_verses():
-        pass
+    def get_multiple_verses(search_param):
+        book_requested = Helper.get_the_book_requested(
+            search_param,
+            Search.book_starts_with_no
+        )
+        exists = Helper.is_book_in_Bible(book_requested['book'])
+
+        if exists is not False:
+            v = book_requested['verses'].split('-')
+
+            if v[0] > v[1]:
+                print("1st verse larger than last verse.")
+                return
+
+            # include the last one
+            verses_range = list(range(int(v[0]), int(v[1])) + 1)
+            verses = Bible.objects.filter(
+                bookname=book_requested['book'],
+                chapter=book_requested['chapter'],
+                verse__in=verses_range
+            )
+
+            # Join up all the verses into a sentence
+            sentense = Helper.buildSentense(verses, book_requested)
+            return sentense
+        else:
+            return None
 
     @staticmethod
     def get_chapter():
