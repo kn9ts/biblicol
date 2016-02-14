@@ -11,7 +11,7 @@ class Bible(models.Model):
     text = models.TextField()
     keywords = models.TextField(null=True)
     quoted = models.CharField(max_length=100)
-    title = models.CharField(max_length=100, null=True)
+    title = models.CharField(max_length=256, null=True)
     abbrev = models.CharField(max_length=100)
     created_date = models.DateTimeField(default=timezone.now,
                                         blank=True, null=True)
