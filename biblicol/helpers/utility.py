@@ -80,3 +80,13 @@ class Helper(object):
                 break_down['book'] = book_number + ' ' + re.sub(r'\d{1,}', '', splitted_param[0])
 
         return break_down
+
+    @staticmethod
+    def extract_common_words(text=None):
+        stop_words = []
+
+        if text is not None:
+            text = re.sub(r'(\.|\/|\s{1,}|\~|\-|\#|\@|\!|\&|\*|\"|\?|\\\\|\,|\_)+', ' ', text)
+            text = re.sub(r'([0-9]+\/[0-9]+:?|\')+', '', text)
+            text = re.sub(r'[^a-zA-Z0-9 -]', '', text.strip()).lower()
+            return text
