@@ -207,15 +207,34 @@ class Search(object):
             # pass
 
     @staticmethod
-    def search_in_book():
-        pass
+    def search_in_book(search_param):
+        book = search_param.split(':')[0].strip()
+        book_requested = Helper.get_the_book_requested(
+            book,
+            Search.book_starts_with_no
+        )
+        book_exists = Helper.is_book_in_Bible(book_requested['book'])
+
+        # get the valid bookname if it exists
+        if (True if book_exists else False):
+            search_string = ' '.join([x for x in search_param.split(':')
+                                      if x is not book])
+
+            results = Search.my_simple_duckduckgo_search(search_string, 0, 30, book_requested['book'])
+            if len(results) is not 0:
+                return results
+            else:
+                search_param = re.sub(r'(\:|\s)', ' and ', search_param)
+                results = Search.run_a_really_simple_search(search_param, book_requested['book'])
+        else:
+            return None
 
     @staticmethod
     def my_simple_duckduckgo_search():
         pass
 
     @staticmethod
-    def really_simple_search():
+    def run_a_really_simple_search():
         pass
 
     @staticmethod
