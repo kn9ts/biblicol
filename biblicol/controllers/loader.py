@@ -4,7 +4,7 @@ import json
 from django.http import HttpResponse
 from ..models.bible import Bible
 from ..models.bookstats import BookStats
-from ..helpers.utility import Helper
+from ..utilities.helper import Helper
 
 
 class Loader(object):

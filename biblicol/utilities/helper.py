@@ -83,7 +83,7 @@ class Helper(object):
 
     @staticmethod
     def extract_common_words(text=None):
-        stop_words = []
+        # stop_words = []
 
         if text is not None:
             text = re.sub(r'(\.|\/|\s{1,}|\~|\-|\#|\@|\!|\&|\*|\"|\?|\\\\|\,|\_)+', ' ', text)
