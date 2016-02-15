@@ -1,4 +1,5 @@
 import re
+import operator
 
 
 class Helper(object):
@@ -83,10 +84,38 @@ class Helper(object):
 
     @staticmethod
     def extract_common_words(text=None):
-        # stop_words = []
+        stop_words = []
 
         if text is not None:
+            # strip out these symbols for spaces or nothing
             text = re.sub(r'(\.|\/|\s{1,}|\~|\-|\#|\@|\!|\&|\*|\"|\?|\\\\|\,|\_)+', ' ', text)
             text = re.sub(r'([0-9]+\/[0-9]+:?|\')+', '', text)
             text = re.sub(r'[^a-zA-Z0-9 -]', '', text.strip()).lower()
-            return text
+
+            # get words that
+            # are not empty strings
+            # are more than 3 characters long
+            # are not stop words
+            appropriate_search_words = [x for x in text.split()
+                                        if len(x) > 2 and x is not '' and
+                                        x not in stop_words]
+
+            word_count = {}
+            # count how many times a word appears in the sentense
+            for word in appropriate_search_words:
+                # if more than one time, count up (x+1)
+                word_count[word] = word_count[word] + 1 \
+                    if word in word_count else 1
+
+            # sort by the words that appear most
+            sorted_word_count = sorted(
+                word_count.items(),
+                key=operator.itemgetter(1),
+                reverse=True
+            )
+
+            # return only the top most 20 {word: count} objects
+            sorted_word_count = [{x[0]:x[1]} for x in sorted_word_count[:20]]
+            return sorted_word_count
+        else:
+            return stop_words
