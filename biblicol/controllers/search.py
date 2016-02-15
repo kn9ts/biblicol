@@ -230,8 +230,22 @@ class Search(object):
             return None
 
     @staticmethod
-    def my_simple_duckduckgo_search():
-        pass
+    def my_simple_duckduckgo_search(search_param, start=0, limit=30, book=None, try_simple=False):
+        keywords = r''
+        search_param = re.sub(r'(\.|\/|\s{2,}|\~|\-|\#|\@|\!|\&|\*|\"|\?|\\|\,|\_)', '', search_param)
+
+        if try_simple is True:
+            stop_words = Helper.extract_common_words()
+            keywords = '|'.join([word for word in search_param.split(' ')
+                                 if word not in stop_words])
+        else:
+            cleaned_param = Helper.extract_common_words(search_param)
+            keywords = '|'.join([word[0] for word in
+                                 [list(x.keys()) for x in cleaned_param]])
+
+        search = r'({search_regex})'.format(search_regex=keywords)
+        results = Bible.objects.filter(bookname=book, keywords__regex=search)
+        return results[start:(start+limit)]
 
     @staticmethod
     def run_a_really_simple_search():
