@@ -2,7 +2,7 @@ import re
 from django.shortcuts import render
 from django.http import HttpResponse
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from ..helpers.utility import Helper
+from ..utilities.helper import Helper
 from ..models.bible import Bible
 
 
@@ -66,7 +66,7 @@ class Search(object):
             else:
                 param = "abcdefghijklmnopqrstuvwxyz"
 
-            if re.match(r'^([\w.\-\d]+){1}$', param) is True:
+            if re.match(r'^([\w.\-\d]+){1}$', param) is not None:
                 book = Helper.get_the_book_requested(param)
                 book_is_valid = Helper.is_book_in_bible(book)
 
@@ -147,9 +147,9 @@ class Search(object):
             search_param,
             Search.book_starts_with_no
         )
-        exists = Helper.is_book_in_Bible(book_requested['book'])
+        book_exists = Helper.is_book_in_Bible(book_requested['book'])
 
-        if exists is not False:
+        if (True if book_exists else False):
             return Search.show(
                 book_requested['book'],
                 book_requested['chapter'],
@@ -165,9 +165,9 @@ class Search(object):
             search_param,
             Search.book_starts_with_no
         )
-        exists = Helper.is_book_in_Bible(book_requested['book'])
+        book_exists = Helper.is_book_in_Bible(book_requested['book'])
 
-        if exists is not False:
+        if (True if book_exists else False):
             v = book_requested['verses'].split('-')
 
             if v[0] > v[1]:
@@ -189,8 +189,22 @@ class Search(object):
             return None
 
     @staticmethod
-    def get_chapter():
-        pass
+    def get_chapter(search_param):
+        book_requested = Helper.get_the_book_requested(
+            search_param,
+            Search.book_starts_with_no
+        )
+        book_exists = Helper.is_book_in_Bible(book_requested['book'])
+
+        if (True if book_exists else False):
+            verses_of_the_chapter = Bible.objects.filter(
+                bookname=book_requested['book'],
+                chapter=book_requested['chapter']
+            )
+
+            sentense = Helper.build_sentence(verses_of_the_chapter, book_requested)
+            return sentense
+            # pass
 
     @staticmethod
     def search_in_book():
