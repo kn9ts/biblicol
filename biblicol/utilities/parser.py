@@ -6,6 +6,10 @@ class Parser(object):
     Token = collections.namedtuple('Token', ['typ', 'value'])
 
     def tokenize(self, statement):
+        """
+        Returns a list of [Token('typ', 'value'), Token()...]
+        extracted from the statement provided
+        """
         token_specification = [
             ('NUMBER', r'\d+(\.\d*)?'),         # Integer or decimal number
             ('AND_NOT', r'(and\s+not)'),        # Match AND NOT
@@ -34,6 +38,36 @@ class Parser(object):
                 yield self.Token(kind, value)
 
     def create_postgres_query_string(self, statement, db_column='keywords'):
+        """
+        -------- SIMPLE ALTERNATIVE TO A FULLTEXT SEARCH in SQL --------
+        *
+        * NO FULLTEXT
+        * NO BOOLEAN MODE
+        * NO database modifications required
+        * NO breaking - in searches or script
+        *
+        * @Params COVERED:
+        *
+        *  [x] -> love hope -- it searches for both or either
+        *  [x] -> "sick love" ('' or "") -- searches for exact phrase
+        *  [x] -> love and hate -- searches for stories containing both words.
+        *  [x] -> love and hate or faith -- searches for stories containing "love" and "hate" and maybe "faith"
+        *  [x] -> love and hate (and not|not) faith
+        *  [x] -> love (and not|not) hope
+        *  [x] -> "aids patient" or hiv
+        *  [x] -> "aids patient" and hiv and not cancer
+        *  [x] -> "aids patient" (and not|not) hiv or cancer
+        *
+        * "and" becomes "AND {database_column} ~* 'word'"
+        * "or" becomes "OR {database_column} ~* 'word'"
+        * "and not/not" becomes "AND NOT {database_column} ~* 'word'"
+        *
+        * STEPS to consider:
+        * 1. Find the search parameter QUOTED
+        * 2. Find if all occur in a text, not necessarily adjuscent (this AND that)
+        * 3. Try find if either of the params are in a text (this OR that)
+        *
+        """
         pattern_replacements = {
             'and': 'AND {db_column} ~*',
             'and not': 'AND {db_column} NOT ~*',
@@ -132,18 +166,3 @@ class Parser(object):
         # print(re.findall(postgres_keywords_pattern, query_token, re.I))
         psql_query_string = re.sub(postgres_keywords_pattern, unqoute_posgres_keywords, query_token)
         return psql_query_string.format(db_column=db_column)
-
-
-# Run some tests
-# p = Parser()
-# print(p.create_postgres_query_string('Jesus saves people or bread "jesus wept"'))
-# print(p.create_postgres_query_string('"he wept" or earth and heaven or hell or not "lost hope"'))
-# print(p.create_postgres_query_string('"sick love" ('' or "")'))
-# print(p.create_postgres_query_string('love and hate'))
-# print(p.create_postgres_query_string('love and hate or faith'))
-# print(p.create_postgres_query_string('love and hate and not faith'))
-# print(p.create_postgres_query_string('love not hope'))
-# print(p.create_postgres_query_string('"aids patient" or hiv'))
-# print(p.create_postgres_query_string('"aids patient" and hiv'))
-# print(p.create_postgres_query_string('"aids patient" not hiv'))
-# print(p.create_postgres_query_string('bread fish water and wine'))
