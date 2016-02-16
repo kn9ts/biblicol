@@ -33,13 +33,13 @@ class Parser(object):
             else:
                 yield self.Token(kind, value)
 
-    def create_postgres_query_string(self, statement):
+    def create_postgres_query_string(self, statement, db_column='keywords'):
         pattern_replacements = {
-            'and': 'AND keywords ~*',
-            'and not': 'AND keywords NOT ~*',
-            'or': 'OR keywords ~*',
-            'or not':   'OR keywords NOT ~*',
-            'not': 'AND keywords NOT ~*'
+            'and': 'AND {db_column} ~*',
+            'and not': 'AND {db_column} NOT ~*',
+            'or': 'OR {db_column} ~*',
+            'or not':   'OR {db_column} NOT ~*',
+            'not': 'AND {db_column} NOT ~*'
         }
 
         # tokenize the statement given
@@ -84,7 +84,7 @@ class Parser(object):
 
         # string back the tokens back together
         # dont forget the 1st words is also part of the search
-        query_token = '~* ' + ' '.join(list(tokens))
+        query_token = 'WHERE keywords ~* ' + ' '.join(list(tokens))
 
         # match for words sharing the same REGEX conjunctions
         # eg. 'Jesus' 'saves' 'people' 'OR keywords ~*' 'bread' '(jesus wept)'
@@ -128,10 +128,10 @@ class Parser(object):
             query_token = re.sub(match_adjuscent_words, adjuscent_words_replacement, query_token)
             # return query_token
 
-        postgres_keywords_pattern = r'(\'(AND|OR|NOT)[\w\s\~\*]+\')+'
+        postgres_keywords_pattern = r'(\'(AND|OR|NOT)[\w\s\~\*\{\}]+\')+'
         # print(re.findall(postgres_keywords_pattern, query_token, re.I))
         psql_query_string = re.sub(postgres_keywords_pattern, unqoute_posgres_keywords, query_token)
-        return psql_query_string
+        return psql_query_string.format(db_column=db_column)
 
 
 # Run some tests
