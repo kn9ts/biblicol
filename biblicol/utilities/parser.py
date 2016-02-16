@@ -84,7 +84,7 @@ class Parser(object):
 
         # string back the tokens back together
         # dont forget the 1st words is also part of the search
-        query_token = 'WHERE keywords ~* ' + ' '.join(list(tokens))
+        query_token = 'keywords ~* ' + ' '.join(list(tokens))
 
         # match for words sharing the same REGEX conjunctions
         # eg. 'Jesus' 'saves' 'people' 'OR keywords ~*' 'bread' '(jesus wept)'
@@ -135,15 +135,15 @@ class Parser(object):
 
 
 # Run some tests
-p = Parser()
-print(p.create_postgres_query_string('Jesus saves people or bread "jesus wept"'))
-print(p.create_postgres_query_string('"he wept" or earth and heaven or hell or not "lost hope"'))
-print(p.create_postgres_query_string('"sick love" ('' or "")'))
-print(p.create_postgres_query_string('love and hate'))
-print(p.create_postgres_query_string('love and hate or faith'))
-print(p.create_postgres_query_string('love and hate and not faith'))
-print(p.create_postgres_query_string('love not hope'))
-print(p.create_postgres_query_string('"aids patient" or hiv'))
-print(p.create_postgres_query_string('"aids patient" and hiv'))
-print(p.create_postgres_query_string('"aids patient" not hiv'))
-print(p.create_postgres_query_string('bread fish water and wine'))
+# p = Parser()
+# print(p.create_postgres_query_string('Jesus saves people or bread "jesus wept"'))
+# print(p.create_postgres_query_string('"he wept" or earth and heaven or hell or not "lost hope"'))
+# print(p.create_postgres_query_string('"sick love" ('' or "")'))
+# print(p.create_postgres_query_string('love and hate'))
+# print(p.create_postgres_query_string('love and hate or faith'))
+# print(p.create_postgres_query_string('love and hate and not faith'))
+# print(p.create_postgres_query_string('love not hope'))
+# print(p.create_postgres_query_string('"aids patient" or hiv'))
+# print(p.create_postgres_query_string('"aids patient" and hiv'))
+# print(p.create_postgres_query_string('"aids patient" not hiv'))
+# print(p.create_postgres_query_string('bread fish water and wine'))
