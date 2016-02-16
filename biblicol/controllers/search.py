@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from ..utilities.helper import Helper
+from ..utilities.parser import Parser
 from ..models.bible import Bible
 
 
@@ -252,5 +253,8 @@ class Search(object):
         pass
 
     @staticmethod
-    def no_boolean_search():
-        pass
+    def no_boolean_search(search_param, book=None, start=0, limit=30):
+        p = Parser()
+        postgres_where_string = p.create_postgres_query_string(search_param)
+        results = Bible.objects.extra(where=[postgres_where_string])
+        return results[start:(start+limit)]
