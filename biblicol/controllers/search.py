@@ -2,6 +2,9 @@ import re
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core import serializers
+from django.db.models import Value as V, CharField
+from django.db.models.functions import Concat
+# from django.db.models import ExpressionWrapper as Exp
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from ..utilities.helper import Helper
 from ..utilities.parser import Parser
@@ -177,11 +180,18 @@ class Search(object):
         book_exists = Helper.is_book_in_Bible(book_requested['book'])
 
         if book_exists:
-            return Bible.objects.filter(
-                bookname=book_requested['book'],
-                chapter=book_requested['chapter'],
-                verse__contains=book_requested['verses']
-            )
+            results = Bible.objects\
+                .annotate(bible_verse=Concat(
+                    'bookname', V(' '), 'chapter', V(':'), 'verse',
+                    output_field=CharField()
+                ))\
+                .get(
+                    bookname=book_requested['book'],
+                    chapter=book_requested['chapter'],
+                    verse__contains=book_requested['verses']
+                )
+            # response needs be an array
+            return [results]
         else:
             return None
 
