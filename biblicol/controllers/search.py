@@ -1,6 +1,6 @@
 import re
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 from django.core import serializers
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from ..utilities.helper import Helper
@@ -261,7 +261,10 @@ class Search(object):
 
             # if there were no results, do try Googling! :)
             else:
-                search_param = re.sub(r'(\:|\s)', ' and ', search_param)
+                # basically replaces spaces and colon with ' and '
+                # eg. "genesis:hope or love"
+                # becomes "genesis and hope and love"
+                search_param = re.sub(r'(\:|\s{1,})', ' and ', search_param)
                 results = Search.complex_search(search_param, book_requested['book'])
         else:
             return []
