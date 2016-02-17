@@ -33,11 +33,11 @@ class Helper(object):
             or bookname in Helper.books['new_testament']
 
     @staticmethod
-    def get_the_book_requested(search_param, starts_with_no):
+    def get_the_book_requested(search_param, starts_with_no=False):
         break_down = {}
         splitted_param = search_param.split(' ')
 
-        # usual books eg. exodus 1:1-15, john 3:16-20
+        # usual books eg. exodus 1:1-15, john 3:16-18
         # splitted_param ==> ['John', '3:16-18'] Indexes(0,1)
         if starts_with_no is False:
             if ':' in search_param:
@@ -47,6 +47,9 @@ class Helper(object):
                 break_down['verses'] = chapter_and_verses[1]
             else:
                 break_down['book'] = splitted_param[0]
+
+                if len(splitted_param) > 1:
+                    break_down['chapter'] = splitted_param[1]
 
         # splitted_param ==> ['2(nd)', 'John', '3:16-18'] Indexes(0,1,2)
         else:
@@ -84,6 +87,11 @@ class Helper(object):
 
     @staticmethod
     def extract_common_words(text=None):
+        """
+        Counts the occurence of each word in the text provided
+        returning the top 20 words ordered in decending order of
+        their number of occurences
+        """
         stop_words = []
 
         if text is not None:
@@ -114,7 +122,7 @@ class Helper(object):
                 reverse=True
             )
 
-            # return only the top most 20 {word: count} objects
+            # return only the top most 20 [{word: count}...] objects
             sorted_word_count = [{x[0]:x[1]} for x in sorted_word_count[:20]]
             return sorted_word_count
         else:
