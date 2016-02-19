@@ -193,7 +193,7 @@ class Search(object):
             # response needs be an array
             return [results]
         else:
-            return None
+            return []
 
     @staticmethod
     def get_multiple_verses(search_param):
@@ -224,7 +224,7 @@ class Search(object):
             # return sentense
             return verses
         else:
-            return None
+            return []
 
     @staticmethod
     def get_chapter(search_param):
@@ -247,6 +247,8 @@ class Search(object):
             # sentense = Helper.build_sentence(verses_of_the_chapter, book_requested)
             # return sentense
             return verses_of_the_chapter
+        else:
+            return []
 
     @staticmethod
     def search_in_specific_book(search_param):
