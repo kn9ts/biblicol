@@ -96,7 +96,7 @@ class Search(object):
 
             # just do a simple search
             search_info['is_simple_search'] = True
-            response = Search.my_simple_duckduckgo_search(param)
+            response = Search.my_simple_bible_search(param)
 
             # things have become complicated, let's do a complex search
             if len(response) is 0:
@@ -106,6 +106,7 @@ class Search(object):
             # restore old search param
             param = old_param
 
+        print(search_info)
         return HttpResponse(serializers.serialize('json', response),
                             content_type="application/json")
 
@@ -267,22 +268,16 @@ class Search(object):
                                       if x is not book_to_search_in])
 
             # first run a simple(a bit complex) search
-            results = Search.my_simple_duckduckgo_search(search_string, 0, 30, book_requested['book'])
+            print('search_info: ' + search_string)
+            results = Search.complex_search(search_string, book_requested['book'])
             if len(results) is not 0:
                 return results
 
-            # if there were no results, do try Googling! :)
-            else:
-                # basically replaces spaces and colon with ' and '
-                # eg. "genesis:hope or love"
-                # becomes "genesis and hope and love"
-                search_param = re.sub(r'(\:|\s{1,})', ' and ', search_param)
-                results = Search.complex_search(search_param, book_requested['book'])
-        else:
-            return []
+        # if no results are found, an empty list will be returned
+        return []
 
     @staticmethod
-    def my_simple_duckduckgo_search(search_param, start=0, limit=30, book=None, simple_search=False):
+    def my_simple_bible_search(search_param, book=None, simple_search=False, start=0, limit=30):
         keywords = r''
         search_param = re.sub(r'(\.|\/|\s{2,}|\~|\-|\#|\@|\!|\&|\*|\"|\?|\\|\,|\_)', '', search_param)
 
@@ -309,5 +304,13 @@ class Search(object):
     def no_boolean_search(search_param, book=None, start=0, limit=30):
         p = Parser()
         postgres_where_string = p.create_postgres_query_string(search_param)
-        results = Bible.objects.extra(where=[postgres_where_string])
+
+        results = []
+        if book is not None:
+            results = Bible.objects\
+                .filter(bookname=book)\
+                .extra(where=[postgres_where_string])
+        else:
+            results = Bible.objects.extra(where=[postgres_where_string])
+
         return results[start:(start+limit)]
