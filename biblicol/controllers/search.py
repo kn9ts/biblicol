@@ -19,6 +19,10 @@ class Search(object):
 
     @staticmethod
     def index(request, param='', pageno=1):
+        """
+        All search requests are recieved here, passed to the right function
+        Which give back results that 'index' sends back
+        """
         # if nothing has been passed to the search,
         # redirect back to home page
         if param == '':
