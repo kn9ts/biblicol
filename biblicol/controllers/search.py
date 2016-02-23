@@ -116,6 +116,11 @@ class Search(object):
 
     @staticmethod
     def collect_current_search_info(search_param):
+        """
+        Get the search param and try extract what exactly
+        the user is trying to look for eg. searching in a book,
+        searching for a chapter, searching for a certain excerpt etc
+        """
         search_info = {
             'is_book_search': False,
             'is_chapter_search': False,
@@ -257,7 +262,10 @@ class Search(object):
 
     @staticmethod
     def search_in_specific_book(search_param):
-        # expect search_param => "genesis:hope or love"
+        """
+        Expect search_param to be something like "genesis:hope or love
+        Meaning: find "hope" or "love" text content in genesis
+        """
         param = [x.strip() for x in search_param.split(':')]
         book_to_search_in = param[0]
         book_requested = Helper.get_the_book_requested(
@@ -306,6 +314,7 @@ class Search(object):
 
     @staticmethod
     def no_boolean_search(search_param, book=None, start=0, limit=30):
+        """Run a complex search without using MYSQL fulltext search"""
         p = Parser()
         postgres_where_string = p.create_postgres_query_string(search_param)
 
