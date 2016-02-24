@@ -314,7 +314,11 @@ class Search(object):
 
     @staticmethod
     def no_boolean_search(search_param, book=None, start=0, limit=30):
-        """Run a complex search without using MYSQL fulltext search"""
+        """
+        Run a complex search without using MYSQL fulltext search
+        The PostgresSQL search string generator has been moved
+        to utilities/parser.py
+        """
         p = Parser()
         postgres_where_string = p.create_postgres_query_string(search_param)
 
