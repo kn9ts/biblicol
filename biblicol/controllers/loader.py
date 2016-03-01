@@ -11,6 +11,10 @@ class Loader(object):
 
     @staticmethod
     def load_books_into_db(request):
+        """
+        Get's each BOOK from it's JSON data file_data
+        and loads it up into the DB
+        """
         the_json_books = glob.glob(os.path.join('biblicol/data/books/', '*.json'))
         # print(the_json_books)
 
@@ -63,6 +67,7 @@ class Loader(object):
 
     @staticmethod
     def load_chapter_stats_into_db(request=None):
+        """Get's the data of how many chapters each book in the bible has"""
         with open('biblicol/data/books-chapter-info.json', mode='r', encoding='utf-8') as file_data:
             data = json.loads(file_data.read())
             books = data.get('books')
@@ -80,6 +85,10 @@ class Loader(object):
 
     @staticmethod
     def load_verse_stats_into_db(request=None):
+        """
+        Get's the data of how many verses each
+        chapter for every book in the bible has
+        """
         path = 'biblicol/data/books-info/'
         for book_info_file in glob.glob(os.path.join(path, '*.json')):
 
